@@ -94,9 +94,8 @@ rule token = parse
   | "<<=" { SHIFT_LEFT_EQ }
   | ">>=" { SHIFT_RIGHT_EQ }
   | "->" { ARROW }
-  | digit+ { INT(int_of_string (Lexing.lexeme lexbuf)) }
-  | digit+ ('.' digit*)? (['e' 'E'] ['+' '-']? digit+)?
-    { FLOAT(float_of_string (Lexing.lexeme lexbuf)) }
+  | digit+ as integer { INT(int_of_string integer) }
+  | digit+ ('.' digit*)? (['e' 'E'] ['+' '-']? digit+)? as number { FLOAT(float_of_string number) }
   | id as id { find_token id }
   | _ as c
     { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
