@@ -1,5 +1,8 @@
 Name: min_caml_for_c
 Version: 0.1
+Synopsis: A tiny c compiler
+Authors: Nora Sandler
+License: MIT
 
 Description: A simple compiler for a subset of C
 

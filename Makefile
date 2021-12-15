@@ -2,6 +2,8 @@
 # DO NOT EDIT (digest: a3c674b4239234cbbe53afe090018954)
 
 SETUP = ocaml setup.ml
+LEXER = lexer.mll
+OCAMLLEX = ocamllex
 
 build: setup.data
 	$(SETUP) -build $(BUILDFLAGS)
@@ -14,6 +16,7 @@ test: setup.data build
 
 all:
 	$(SETUP) -all $(ALLFLAGS)
+	$(OCAMLLEX) $(LEXER)
 
 install: setup.data
 	$(SETUP) -install $(INSTALLFLAGS)
