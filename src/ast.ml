@@ -1,4 +1,3 @@
-(* abstract syntax tree *)
 type const =
   | Int of int
   | Char of char
