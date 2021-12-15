@@ -1,0 +1,33 @@
+Name: min_caml_for_c
+Version: 0.1
+
+Description: A simple compiler for a subset of C
+
+OASISFormat: 0.4
+BuildTools: ocamlbuild
+Plugins: META (0.4), DevFiles (0.4)
+
+Executable "min_caml_for_c"
+    Path: src
+    MainIs: main.ml
+    BuildDepends:
+        str, batteries
+
+Library "min_caml_for_c_lib"
+    Path: src
+    Modules: Lex, Parse, Gen
+    BuildDepends:
+        batteries
+
+Executable "test"
+    Path: tst
+    MainIs: test_main.ml
+    Build$: flag(tests)
+    Install: false
+    BuildDepends:
+        oUnit, min_caml_for_c_lib
+
+Test "test_main"
+    TestTools: test_main
+    Command: $test_main
+    WorkingDirectory: tst
