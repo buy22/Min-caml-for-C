@@ -14,7 +14,7 @@ let label f =
   f ^ ":\n" |> my_print_string
 
 (* Instructor without operator *)
-let nacmd c =
+let no_op c =
   String.concat ["\t";  c;  "\n"] |> my_print_string
 
 (* Instructor with 1 operator *)
@@ -102,10 +102,10 @@ let jmp = one_op "JMP"
 
 let call = one_op "CALL"
 
-let nop = nacmd "NOP"
+let nop = no_op "NOP"
 
-let ret = nacmd "RET"
+let ret = no_op "RET"
 
 let enter = two_op "ENTER"
 
-let leave = nacmd "LEAVE"
+let leave = no_op "LEAVE"
