@@ -68,6 +68,8 @@ and statement =
   | ReturnVal of exp (* should we add a return_exp instead? *)
   | Break
   | Continue
+  | Goto of string
+  | Nop
 
 type fun_param = Param of type_def * id
 

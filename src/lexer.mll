@@ -1,7 +1,7 @@
 {
+  open Core
   open Lexing
   open Parser
-  open Type
 
   exception SyntaxError of string
 

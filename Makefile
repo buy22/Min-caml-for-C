@@ -1,44 +1,30 @@
-# OASIS_START
-# DO NOT EDIT (digest: a3c674b4239234cbbe53afe090018954)
+.PHONY: all clean byte native profile debug sanity test
 
-SETUP = ocaml setup.ml
-LEXER = lexer.mll
-OCAMLLEX = ocamllex
+OCB_FLAGS = -use-ocamlfind -use-menhir -I src # uses menhir
+# OCB = ocamlbuild $(OCB_FLAGS)
+OCB = corebuild $(OCB_FLAGS)
 
-build: setup.data
-	$(SETUP) -build $(BUILDFLAGS)
-
-doc: setup.data build
-	$(SETUP) -doc $(DOCFLAGS)
-
-test: setup.data build
-	$(SETUP) -test $(TESTFLAGS)
-
-all:
-	$(SETUP) -all $(ALLFLAGS)
-	$(OCAMLLEX) $(LEXER)
-
-install: setup.data
-	$(SETUP) -install $(INSTALLFLAGS)
-
-uninstall: setup.data
-	$(SETUP) -uninstall $(UNINSTALLFLAGS)
-
-reinstall: setup.data
-	$(SETUP) -reinstall $(REINSTALLFLAGS)
+all: native byte # profile debug
 
 clean:
-	$(SETUP) -clean $(CLEANFLAGS)
+	$(OCB) -clean
 
-distclean:
-	$(SETUP) -distclean $(DISTCLEANFLAGS)
+native: sanity
+	$(OCB) main.native
 
-setup.data:
-	$(SETUP) -configure $(CONFIGUREFLAGS)
+byte: sanity
+	$(OCB) main.byte
 
-configure:
-	$(SETUP) -configure $(CONFIGUREFLAGS)
+profile: sanity
+	$(OCB) -tag profile main.native
 
-.PHONY: build doc test all install uninstall reinstall clean distclean configure
+debug: sanity
+	$(OCB) -tag debug main.byte
 
-# OASIS_STOP
+# check that menhir is installed, use "opam install menhir"
+sanity:
+	which menhir
+
+test: native
+	./main.native < test/test.c > test/test.s
+	clang test/test.s -o test/test

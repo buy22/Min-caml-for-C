@@ -1,14 +1,12 @@
-open Batteries
+open Core
+open Ast
+open Generate
 
-let compile prog_filename =
-    let source_lines = File.lines_of prog_filename in
-    let ast = Enum.reduce (fun line1 line2 -> line1^" "^line2) source_lines
-    |> Lexer.lexer
-    |> Parse.parse
-    in
-    Gen.generate prog_filename ast
-
-(* TODO: verify .c file extension *)
-let filename = Array.get Sys.argv 1
-
-let _ = compile filename
+let () =
+  let lexbuf = Lexing.from_channel In_channel.stdin in
+  let result = Parser.program Lexer.token lexbuf in
+  (* output ast *)
+  (* result |> string_of_prog |> print_string;
+     Out_channel.newline stdout; *)
+  (gen_temp_lib Out_channel.stdout); ();
+  gen_prog result Out_channel.stdout

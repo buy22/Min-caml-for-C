@@ -43,11 +43,8 @@
 %%
 
 type_def:
-  | VOID_KW { VoidType }
   | INT_KW { IntType }
   | CHAR_KW { CharType }
-  | FLOAT_KW { FloatType }
-  | DOUBLE_KW { DoubleType }
 
 program:
   | fun_decl program { Prog ($1 :: $2) }
@@ -81,7 +78,7 @@ statements:
   | statement statements { $1 :: $2 }
 
 statement:
-  | ddecl_exp SEMICOLON
+  | decl_exp SEMICOLON
     { Decl $1 }
   | RETURN_KW exp SEMICOLON
     { ReturnVal $2 }
@@ -110,12 +107,12 @@ statement:
     { Continue }
   | l = ID COLON
     { Label l }
-  | GOTO_KW l = ID SEMICOLON
-    { Goto l }
+  | GOTO_KW ID SEMICOLON
+    { Goto $2 }
   | SEMICOLON
     { Nop }
-  | b = block
-    { Compound b }
+  | block
+    { Block $1 }
 
 decl_exp:
   var_type = type_def id = ID e = decl_exp_init
