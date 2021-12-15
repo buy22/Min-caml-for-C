@@ -6,7 +6,17 @@
 *)
 
 open Core
-open Context
+
+type context = {
+  fun_name : string;
+  scope_levelc : int;
+  labelc : int;
+  startlb : string list;
+  endlb : string list;
+  index : int;
+  vars : context_var list;
+  out : Out_channel.t;
+}
 
 let my_print_string s ctx = Out_channel.output_string ctx.out s; ctx
 
