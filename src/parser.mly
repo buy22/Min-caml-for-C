@@ -48,55 +48,45 @@ type_def:
   | CHAR_KW { CharType }
   | FLOAT_KW { FloatType }
   | DOUBLE_KW { DoubleType }
-  | t = type_def MULT
-    { PointerType t }
 
 program:
-  | f = fun_decl p = program
-    { let Prog fs = p in Prog (f :: fs) }
+  | fun_decl program { Prog ($1 :: $2) }
   | EOF { Prog [] }
-;
 
 fun_decl:
-  ftype = type_def id = ID
-  PAREN_OPEN params = params PAREN_CLOSE
-  body = block
-  { { name = id;
-      fun_type = ftype;
-      params;
-      body; } }
-;
+  type_def ID PAREN_OPEN params PAREN_CLOSE block
+  { { name = $2;
+      fun_type = $1;
+      $4;
+      $6; } }
 
 params:
   | { [] }
-  | t = type_def id = option(ID)
-    { [(id, t)] }
-  | t = type_def id = option(ID) COMMA ps = params
-    { (id, t) :: ps }
+  | type_def ID
+    { [($2, $1)] }
+  | type_def ID COMMA params
+    { ($2, $1) :: $4 }
 
 args:
   | { [] }
-  | e = exp { [e] }
-  | e = exp COMMA es = args
-    { e :: es }
+  | exp { [$1] }
+  | exp COMMA args
+    { $1 :: $3 }
 
 block:
-  | BRACE_OPEN sts = statements BRACE_CLOSE
-    { sts }
+  | BRACE_OPEN statements BRACE_CLOSE { $2 }
 
 statements:
   | { [] }
-  | s = statement ss = statements
-    { s :: ss }
-;
+  | statement statements { $1 :: $2 }
 
 statement:
-  | de = decl_exp SEMICOLON
-    { Decl de }
-  | RETURN_KW e = exp SEMICOLON
-    { ReturnVal e }
-  | e = exp SEMICOLON
-    { Exp e }
+  | ddecl_exp SEMICOLON
+    { Decl $1 }
+  | RETURN_KW exp SEMICOLON
+    { ReturnVal $2 }
+  | exp SEMICOLON
+    { Exp $1 }
   | IF_KW PAREN_OPEN cond = exp PAREN_CLOSE
     tstat = statement fstat = if_fstat
     { If { cond; tstat; fstat; } }
@@ -126,7 +116,6 @@ statement:
     { Nop }
   | b = block
     { Compound b }
-;
 
 decl_exp:
   var_type = type_def id = ID e = decl_exp_init
@@ -169,7 +158,6 @@ exp:
     { SizeofType t }
   | SIZEOF_KW PAREN_OPEN e = exp PAREN_CLOSE
     { SizeofExp e }
-;
 
 %inline binop:
   | PLUS { Add }
@@ -190,7 +178,6 @@ exp:
   | XOR { Xor }
   | SHIFT_LEFT { ShiftL }
   | SHIFT_RIGHT { ShiftR }
-;
 
 %inline assign_op:
   | EQ { AssignEq }
