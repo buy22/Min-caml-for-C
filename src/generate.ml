@@ -143,7 +143,7 @@ and gen_args i args =
     then raise (CodeGenError "to many args")
     else
       gen_exp arg
-      >> movq "%rax" arg_regs.(i)
+      >> movw "%rax" arg_regs.(i)
       >> gen_args (i + 1) args
   | [] -> Fn.id
 
