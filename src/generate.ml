@@ -88,6 +88,9 @@ let rec get_exp_type ctx = function
   | Assign (_, _, e) -> get_exp_type ctx e
   | FunCall _ -> IntType
 
+let arg_regs =
+  Array.of_list ["%rdi"; "%rsi"; "%rdx"; "%rcx"; "%r8"; "%r9"]
+
 let rec gen_exp e (ctx : context) =
   match e with
   | Const c ->
@@ -130,8 +133,19 @@ let rec gen_exp e (ctx : context) =
     let bexp = (BinOp (gen_assign_op op, Var lexp, rexp)) in
       gen_exp (Assign (Equals, lexp, bexp)) ctx
   | FunCall (ID f, args) -> (* TODO *)
-    ctx
-      |> call f
+    gen_args 0 args ctx
+    |> call f
+
+and gen_args i args =
+  match args with
+  | arg :: args ->
+    if i + 1 >= Array.length arg_regs
+    then raise (CodeGenError "to many args")
+    else
+      gen_exp arg
+      >> movq "%rax" arg_regs.(i)
+      >> gen_args (i + 1) args
+  | [] -> Fn.id
 
 let gen_declaration (de : declaration) ctx =
   (match get_var_level de.var_name ctx with
@@ -252,6 +266,7 @@ let rec init_params i params ctx =
   | (None, _) :: ps -> init_params (i + 1) ps ctx
   | (Some v, t) :: ps ->
     ctx
+    |> push arg_regs.(i)
     |> add_var v t
     |> init_params (i + 1) ps
   | _ -> ctx
