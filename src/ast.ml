@@ -52,12 +52,16 @@ type exp =
 
 type declaration =
   { var_type: type_def;
-    var_name: string;
+    var_name: id;
     init: exp option;
   }
 [@@deriving sexp]
 
-and block = statement list
+type block_item =
+  | Statement of statement
+  | Decl of declaration
+
+and block = block_item list
 
 and statement =
   | Block of block
@@ -68,7 +72,6 @@ and statement =
   | While of {cond: exp; body: statement}
   | DoWhile of {body: statement; cond: exp}
   | ReturnVal of exp
-  | Decl of declaration
   | Break
   | Continue
 [@@deriving sexp]
