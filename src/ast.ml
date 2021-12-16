@@ -1,11 +1,15 @@
+open Core
+
 type const =
   | Int of int
   | Char of char
   | String of string
+[@@deriving sexp]
 
 type type_def =
   | IntType
   | CharType
+[@@deriving sexp]
 
 type binop =
   | Add
@@ -24,13 +28,17 @@ type binop =
   | And
   | Or
   | Xor
+[@@deriving sexp]
 
 type assign_op =
   | Equals (* = *)
+[@@deriving sexp]
 
 type monop = Negate | Pos | Complement | Not
+[@@deriving sexp]
 
 type id = ID of string
+[@@deriving sexp]
 
 type exp =
   | Const of const
@@ -40,12 +48,14 @@ type exp =
   | TernOp of exp * exp * exp
   | Assign of assign_op * id * exp
   | FunCall of id * exp list
+[@@deriving sexp]
 
 type declaration =
   { var_type: type_def;
     var_name: id;
     init: exp option;
   }
+[@@deriving sexp]
 
 type block_item =
   | Statement of statement
@@ -64,8 +74,10 @@ and statement =
   | ReturnVal of exp
   | Break
   | Continue
+[@@deriving sexp]
 
 type fun_param = Param of type_def * id
+[@@deriving sexp]
 
 type fun_declaration =
   { fun_type: type_def;
@@ -73,9 +85,15 @@ type fun_declaration =
     params: fun_param list;
     body: block option;
   }
+[@@deriving sexp]
 
 type top_level =
   | Function of fun_declaration
   | GlobalVar of declaration
+[@@deriving sexp]
 
 type prog = Prog of top_level list
+[@@deriving sexp]
+
+
+let string_of_prog p = p |> sexp_of_prog |> Sexp.to_string_hum ~indent:4

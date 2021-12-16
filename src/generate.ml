@@ -75,6 +75,9 @@ let gen_monop (monop : monop) ctx =
     |> movl "$0" "%eax"
     |> sete "%al"
 
+let arg_regs =
+  Array.of_list ["%rdi"; "%rsi"; "%rdx"; "%rcx"; "%r8"; "%r9"]
+
 let rec get_type_size = function
   | IntType -> 4
   | CharType -> 1
@@ -130,8 +133,19 @@ let rec gen_exp e (ctx : context) =
     let bexp = (BinOp (gen_assign_op op, Var lexp, rexp)) in
       gen_exp (Assign (Equals, lexp, bexp)) ctx
   | FunCall (ID f, args) -> (* TODO *)
-    ctx
+    gen_args 0 args ctx
       |> call f
+
+and gen_args i args =
+  match args with
+  | arg :: args ->
+    if i + 1 >= Array.length arg_regs
+    then raise (CodeGenError "to many args")
+    else
+      gen_exp arg
+      >> movw "%rax" arg_regs.(i)
+      >> gen_args (i + 1) args
+  | [] -> Fn.id
 
 let gen_declaration (de : declaration) ctx =
   (match get_var_level de.var_name ctx with
