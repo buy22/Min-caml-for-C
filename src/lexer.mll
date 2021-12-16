@@ -12,34 +12,15 @@
         pos_lnum = pos.pos_lnum + 1
       }
 
-  (* TODO: change to hashmap *)
   let keyword_tabel =
-    [("void", VOID_KW);
-     ("int", INT_KW);
+    [("int", INT_KW);
      ("char", CHAR_KW);
-     ("long", LONG_KW);
-     ("unsigned", UNSIGNED_KW);
-     ("float", FLOAT_KW);
-     ("double", DOUBLE_KW);
-     ("struct", STRUCT_KW);
-     ("const", CONST_KW);
-     ("static", STATIC_KW);
-     ("sizeof", SIZEOF_KW);
      ("return", RETURN_KW);
-     ("goto", GOTO_KW);
      ("if", IF_KW);
      ("else", ELSE_KW);
-     ("switch", SWITCH_KW);
      ("for", FOR_KW);
-     ("do", DO_KW);
-     ("while", WHILE_KW);
-     ("break", BREAK_KW);
-     ("continue", CONTINUE_KW)];;
+     ("while", WHILE_KW)];;
 
-  (* let find_token s =
-    match List.Assoc.find keyword_tabel s ~equal:String.equal with
-    | Some kw -> kw
-    | None -> ID s *)
   let rec find_token s kw_lst =
     match kw_lst with
     | [] -> IDENT s
@@ -61,7 +42,6 @@ rule token = parse
   | '[' { BRACKET_OPEN }
   | ']' { BRACKET_CLOSE }
   | ',' { COMMA }
-  | '?' { QUESTION }
   | ';' { SEMICOLON }
   | ':' { COLON }
   | '!' { BANG }
@@ -71,8 +51,6 @@ rule token = parse
   | '*' { MULT }
   | '/' { DIV }
   | '%' { MOD }
-  | '&' { BIT_AND }
-  | '|' { BIT_OR }
   | '^' { XOR }
   | '<' { LT }
   | "<=" { LE }
@@ -90,14 +68,7 @@ rule token = parse
   | "*=" { MULT_EQ }
   | "/=" { DIV_EQ }
   | "%=" { MOD_EQ }
-  | "&=" { BIT_AND_EQ }
-  | "|=" { BIT_OR_EQ }
-  | "^=" { XOR_EQ }
-  | "<<=" { SHIFT_LEFT_EQ }
-  | ">>=" { SHIFT_RIGHT_EQ }
-  | "->" { ARROW }
   | digit+ as integer { INT(int_of_string integer) }
   | id as s { find_token s keyword_tabel }
-  | _ as c
-    { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
+  | _ as c { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
   | eof { EOF }
