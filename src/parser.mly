@@ -75,8 +75,8 @@ statement:
 
 declaration:
   /* | mult_declaration SEMICOLON  {$1} */
-  | type_def IDENT SEMICOLON {{var_type=$1; var_name=ID $2; init=None}}
-  | type_def IDENT EQ expression SEMICOLON {{var_type=$1; var_name=ID $2; init=Some $4}}
+  | type_def IDENT SEMICOLON {{var_type=$1; var_name=$2; init=None}}
+  | type_def IDENT EQ expression SEMICOLON {{var_type=$1; var_name=$2; init=Some $4}}
 
 /* mult_declaration: */
 
