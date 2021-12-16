@@ -43,7 +43,7 @@ type exp =
 
 type declaration =
   { var_type: type_def;
-    var_name: id;
+    var_name: string;
     init: exp option;
   }
 
