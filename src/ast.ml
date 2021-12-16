@@ -15,29 +15,25 @@ type binop =
   | Mod
   | Lt
   | Gt
-  | Le
-  | Ge
+  | Leq
+  | Geq
   | Neq
   | Eq
   | And
   | Or
-  | BitAnd
-  | BitOr
   | Xor
-  | ShiftL
-  | ShiftR
 
 type assign_op =
   | Equals (* = *)
 
-type unop = Negate | Pos | Complement | Not
+type monoop = Negate | Pos | Complement | Not
 
 type id = ID of string
 
 type exp =
   | Const of const
   | Var of id
-  | UnOp of unop * exp
+  | Monoop of monoop * exp
   | BinOp of binop * exp * exp
   | TernOp of exp * exp * exp
   | Assign of assign_op * id * exp
@@ -65,11 +61,9 @@ and statement =
   | ForDecl of {init: declaration; cond: exp; post: exp option; body: statement}
   | While of {cond: exp; body: statement}
   | DoWhile of {body: statement; cond: exp}
-  | ReturnVal of exp (* should we add a return_exp instead? *)
+  | ReturnVal of exp
   | Break
   | Continue
-  | Goto of string
-  | Nop
 
 type fun_param = Param of type_def * id
 
