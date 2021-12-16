@@ -12,7 +12,7 @@ let off i a =
   String.concat [string_of_int i; "("; a; ")"]
 
 let deallocate_vars ctx1 ctx2 =
-  ignore @@ addq (cint (ctx1.index - ctx2.index)) "%rsp" ctx2;
+  ignore @@ add (cint (ctx1.index - ctx2.index)) "%rsp" ctx2;
   keep_labelc ctx1 ctx2
 
 (* generate *)
@@ -252,7 +252,6 @@ let rec init_params i params ctx =
   | (None, _) :: ps -> init_params (i + 1) ps ctx
   | (Some v, t) :: ps ->
     ctx
-    |> push arg_regs.(i)
     |> add_var v t
     |> init_params (i + 1) ps
   | _ -> ctx
