@@ -133,24 +133,10 @@ let rec gen_exp e (ctx : context) =
     ctx
       |> call f
 
-let gen_declaration (de : declaration) ctx =
-  (match get_var_level de.var_name ctx with
-   | Some l ->
-     if l = ctx.scope_levelc
-     then raise (CodeGenError(de.var_name ^ " has already been defined in the same block"))
-     else ()
-   | None -> ());
-  (match de.init with
-   | Some iexp ->
-     gen_exp iexp ctx
-   | None ->
-     movw "$0" "%rax" ctx)
-  |> push "%rax"
-  |> add_var de.var_name de.var_type
 
 let gen_fun_end = leave >> ret
 
-let gen_statement sta ctx = 
+let rec gen_statement sta ctx = 
   match sta with
   | Block ss ->
     ctx
@@ -190,20 +176,6 @@ let gen_statement sta ctx =
         |> cmpl "$0" "%eax"
         |> je lb1
         |> gen_statement w.body
-        |> jmp lb0
-        |> label lb1
-        |> unset_labels
-  | DoWhlie w ->
-    let lb0 = get_new_label ~name:"DOA" ctx in
-      let lb1 = get_new_label ~name:"DOB" ctx in
-        ctx
-        |> inc_labelc
-        |> set_labels lb0 lb1
-        |> label lb0
-        |> gen_statement w.body
-        |> gen_exp w.cond
-        |> cmpl "$0" "%eax"
-        |> je lb1
         |> jmp lb0
         |> label lb1
         |> unset_labels

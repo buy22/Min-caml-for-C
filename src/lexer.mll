@@ -1,6 +1,7 @@
 {
   open Lexing
   open Parser
+  open Printf
 
   exception SyntaxError of string
 
@@ -23,8 +24,8 @@
 
   let rec find_token s kw_lst =
     match kw_lst with
-    | [] -> IDENT s
-    | (a,b)::xs -> if s = a then b else find_token s xs;;
+    | [] -> (Format.eprintf "%s\n" s; IDENT s)
+    | (a,b)::xs -> if s = a then (Format.eprintf "%s\n" a; b) else find_token s xs;;
 }
 
 let digit = ['0'-'9']
@@ -33,14 +34,14 @@ let newline = '\r' | '\n' | "\r\n"
 let id = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
 rule token = parse
-  | white { token lexbuf }
+  | white { Format.eprintf "white\n"; token lexbuf }
   | newline  { next_line lexbuf; token lexbuf }
-  | '{' { BRACE_OPEN }
-  | '}' { BRACE_CLOSE }
+  | '{' { Format.eprintf "{\n"; BRACE_OPEN }
+  | '}' { Format.eprintf "}\n"; BRACE_CLOSE }
   | '(' { PAREN_OPEN }
   | ')' { PAREN_CLOSE }
   | ',' { COMMA }
-  | ';' { SEMICOLON }
+  | ';' { Format.eprintf ";\n"; SEMICOLON }
   | ':' { COLON }
   | '!' { BANG }
   | '~' { COMPLEMENT }
@@ -54,7 +55,7 @@ rule token = parse
   | "<=" { LE }
   | '>' { GT }
   | ">=" { GE }
-  | '=' { EQ }
+  | '=' { Format.eprintf "=\n"; EQ }
   | "==" { DOUBLE_EQ }
   | "!=" { NEQ }
   | "&&" { AND }
@@ -66,7 +67,7 @@ rule token = parse
   | "*=" { MULT_EQ }
   | "/=" { DIV_EQ }
   | "%=" { MOD_EQ }
-  | digit+ as integer { INT(int_of_string integer) }
+  | digit+ as integer { Format.eprintf "%s\n" integer; INT(int_of_string integer) }
   | id as s { find_token s keyword_tabel }
   | _ as c { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
   | eof { EOF }

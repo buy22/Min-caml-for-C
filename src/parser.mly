@@ -36,7 +36,7 @@
 
 /* %type <Ast.prog> program */
 /* %type <fun_declaration> fun_declaration */
-/* %type <exp> exp */
+%type <exp> expression
 
 %start program
 %type <Ast.prog> program
@@ -71,7 +71,7 @@ statements:
 statement:
   | declaration SEMICOLON {Decl $1}
   | for_statement SEMICOLON {$1}
-  | return_statement SEMICOLON  {$1}
+  | RETURN_KW expression SEMICOLON   { ReturnVal $2 }
 
 declaration:
   /* | mult_declaration SEMICOLON  {$1} */
@@ -81,11 +81,11 @@ declaration:
 /* mult_declaration: */
 
 for_statement:
-  | FOR_KW PAREN_OPEN declaration SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {Statement(ForDecl{init=$3; cond=$5; post=Some $7; body=Block $9})}
-  | FOR_KW PAREN_OPEN expression SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {Statement(For{init=Some $3; cond=$5; post=Some $7; body=Block $9})}
+  | FOR_KW PAREN_OPEN declaration SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {(ForDecl{init=$3; cond=$5; post=Some $7; body=Block $9})}
+  | FOR_KW PAREN_OPEN expression SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {(For{init=Some $3; cond=$5; post=Some $7; body=Block $9})}
 
 return_statement:
-  | RETURN_KW expression SEMICOLON {Statement(ReturnVal $2)}
+  | RETURN_KW expression SEMICOLON { ReturnVal $2 }
 
 expression:
   | IDENT  {Var(ID $1)}
