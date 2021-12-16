@@ -39,8 +39,6 @@ rule token = parse
   | '}' { BRACE_CLOSE }
   | '(' { PAREN_OPEN }
   | ')' { PAREN_CLOSE }
-  | '[' { BRACKET_OPEN }
-  | ']' { BRACKET_CLOSE }
   | ',' { COMMA }
   | ';' { SEMICOLON }
   | ':' { COLON }

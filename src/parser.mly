@@ -104,9 +104,9 @@ binop:
   | DIV { Div }
   | MOD { Mod }
   | LT { Lt }
-  | LE { Leq }
+  | LE { Le }
   | GT { Gt }
-  | GE { Geq }
+  | GE { Ge }
   | DOUBLE_EQ { Eq }
   | NEQ { Neq }
   | AND { And }

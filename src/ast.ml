@@ -15,8 +15,8 @@ type binop =
   | Mod
   | Lt
   | Gt
-  | Leq
-  | Geq
+  | Le
+  | Ge
   | Neq
   | Eq
   | And
