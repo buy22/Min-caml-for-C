@@ -1,8 +1,6 @@
 {
-  open Core
   open Lexing
   open Parser
-  open Ast
 
   exception SyntaxError of string
 
@@ -13,29 +11,49 @@
       { pos with pos_bol = lexbuf.lex_curr_pos;
         pos_lnum = pos.pos_lnum + 1
       }
+
+  (* TODO: change to hashmap *)
+  let keyword_tabel =
+    [("void", VOID_KW);
+     ("int", INT_KW);
+     ("char", CHAR_KW);
+     ("long", LONG_KW);
+     ("unsigned", UNSIGNED_KW);
+     ("float", FLOAT_KW);
+     ("double", DOUBLE_KW);
+     ("struct", STRUCT_KW);
+     ("const", CONST_KW);
+     ("static", STATIC_KW);
+     ("sizeof", SIZEOF_KW);
+     ("return", RETURN_KW);
+     ("goto", GOTO_KW);
+     ("if", IF_KW);
+     ("else", ELSE_KW);
+     ("switch", SWITCH_KW);
+     ("for", FOR_KW);
+     ("do", DO_KW);
+     ("while", WHILE_KW);
+     ("break", BREAK_KW);
+     ("continue", CONTINUE_KW)];;
+
+  (* let find_token s =
+    match List.Assoc.find keyword_tabel s ~equal:String.equal with
+    | Some kw -> kw
+    | None -> ID s *)
+  let rec find_token s kw_lst =
+    match kw_lst with
+    | [] -> IDENT s
+    | (a,b)::xs -> if s = a then b else find_token s xs;;
 }
 
-let digit = ['0' - '9']
-let letter = ['a' - 'z' 'A' - 'Z' '_']
-let whitespace = [' ' '\t']+
+let digit = ['0'-'9']
+let white = [' ' '\t']+
 let newline = '\r' | '\n' | "\r\n"
+let id = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
 rule token = parse
-  | whitespace { token lexbuf }
+  | white { token lexbuf }
   | newline  { next_line lexbuf; token lexbuf }
-  | "void"  { VOID_KW }
-  | "int"   { INT_KW }
-  | "char"  { CHAR_KW }
-  | "float" { FLOAT_KW }
-  | "static"  { STATIC_KW }
-  | "sizeof"  { SIZEOF_KW }
-  | "return"  { RETURN_KW }
-  | "if"    { IF_KW }
-  | "else"  { ELSE_KW }
-  | "for"   { FOR_KW }
-  | "while" { WHILE_KW }
-  | "break" { BREAK_KW }
-  | "continue"  { CONTINUE_KW }
   | '{' { BRACE_OPEN }
   | '}' { BRACE_CLOSE }
   | '(' { PAREN_OPEN }
@@ -72,9 +90,14 @@ rule token = parse
   | "*=" { MULT_EQ }
   | "/=" { DIV_EQ }
   | "%=" { MOD_EQ }
+  | "&=" { BIT_AND_EQ }
+  | "|=" { BIT_OR_EQ }
+  | "^=" { XOR_EQ }
+  | "<<=" { SHIFT_LEFT_EQ }
+  | ">>=" { SHIFT_RIGHT_EQ }
   | "->" { ARROW }
   | digit+ as integer { INT(int_of_string integer) }
-  
-  | letter (letter|digit)* as id { IDENT id }
-  | _ as c { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
+  | id as s { find_token s keyword_tabel }
+  | _ as c
+    { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
   | eof { EOF }
