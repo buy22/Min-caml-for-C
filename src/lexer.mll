@@ -2,6 +2,7 @@
   open Core
   open Lexing
   open Parser
+  open Ast
 
   exception SyntaxError of string
 
@@ -73,7 +74,7 @@ rule token = parse
   | "%=" { MOD_EQ }
   | "->" { ARROW }
   | digit+ as integer { INT(int_of_string integer) }
-  | digit+ ('.' digit*)? (['e' 'E'] ['+' '-']? digit+)? as number { FLOAT(float_of_string number) }
-  | letter (letter|digit)* as id { ID id }
+  
+  | letter (letter|digit)* as id { IDENT id }
   | _ as c { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
   | eof { EOF }

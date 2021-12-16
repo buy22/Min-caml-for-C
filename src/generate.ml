@@ -269,17 +269,10 @@ let gen_fun (f : fun_declaration) out =
   |> init_params 0 f.params
   |> gen_statements f.body
 
-let gen_temp_lib out =
-  { fun_name = "println" ; index= -8;
-    scope_levelc = 0; labelc = 0;
-    startlb = [];  endlb = [];
-    vars = []; out = out; }
-  |> Templib.gen_lib
-
 let rec gen_prog p out =
   match p with
   | Prog [] -> ();
   | Prog (f :: fs) ->
-      let _ = gen_fun f out in
+      gen_fun f out;
         Out_channel.newline out;
           gen_prog (Prog fs) out

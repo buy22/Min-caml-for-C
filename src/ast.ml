@@ -68,7 +68,6 @@ type fun_param = Param of type_def * id
 type fun_declaration =
   { fun_type: type_def;
     name: id;
-    storage_class: storage_class;
     params: fun_param list;
     body: block option;
   }

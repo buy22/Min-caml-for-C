@@ -4,7 +4,7 @@
 
 %token <int> INT
 %token <char> CHAR
-%token <string> ID
+%token <string> IDENT
 %token BRACE_OPEN BRACE_CLOSE PAREN_OPEN PAREN_CLOSE BRACKET_OPEN BRACKET_CLOSE
 %token COMMA QUESTION SEMICOLON COLON
 %token VOID_KW INT_KW CHAR_KW LONG_KW UNSIGNED_KW FLOAT_KW DOUBLE_KW
@@ -34,11 +34,12 @@
 %left MULT DIV MOD
 %nonassoc NEG_MINUS ADDROF DEREF
 
-%type <Ast.prog> program
-%type <fun_decl> fun_decl
-%type <exp> exp
+/* %type <Ast.prog> program */
+/* %type <fun_declaration> fun_declaration */
+/* %type <exp> exp */
 
 %start program
+%type <Ast.prog> program
 
 %%
 
@@ -47,138 +48,78 @@ type_def:
   | CHAR_KW { CharType }
 
 program:
-  | fun_decl program { Prog ($1 :: $2) }
+  | fun_declaration  { Prog(Function($1)::[]) }
   | EOF { Prog [] }
 
-fun_decl:
-  type_def ID PAREN_OPEN params PAREN_CLOSE block
-  { { name = $2;
-      fun_type = $1;
-      $4;
-      $6; } }
+fun_declaration:
+  | type_def IDENT PAREN_OPEN parameters PAREN_CLOSE body_block
+  { { fun_type = $1; name = ID $2; params = $4; body = Some($6) } }
 
-params:
+/* no parameters, one paramter, more than one parameters */
+parameters:
   | { [] }
-  | type_def ID
-    { [($2, $1)] }
-  | type_def ID COMMA params
-    { ($2, $1) :: $4 }
+  | type_def IDENT  { [Param($1, ID $2)] }
+  | type_def IDENT COMMA parameters  { (Param($1, ID $2)) :: $4 }
 
-args:
-  | { [] }
-  | exp { [$1] }
-  | exp COMMA args
-    { $1 :: $3 }
-
-block:
-  | BRACE_OPEN statements BRACE_CLOSE { $2 }
+body_block:
+  | BRACE_OPEN statements BRACE_CLOSE {$2}
 
 statements:
-  | { [] }
-  | statement statements { $1 :: $2 }
+  | {[]}
+  | statement statements  {$1::$2}
 
 statement:
-  | decl_exp SEMICOLON
-    { Decl $1 }
-  | RETURN_KW exp SEMICOLON
-    { ReturnVal $2 }
-  | exp SEMICOLON
-    { Exp $1 }
-  | IF_KW PAREN_OPEN cond = exp PAREN_CLOSE
-    tstat = statement fstat = if_fstat
-    { If { cond; tstat; fstat; } }
-  | FOR_KW PAREN_OPEN init = exp SEMICOLON
-    cond = exp SEMICOLON post = exp PAREN_CLOSE
-    body = statement
-    { For { init; cond; post; body; } }
-  | FOR_KW PAREN_OPEN init = decl_exp SEMICOLON
-    cond = exp SEMICOLON post = exp PAREN_CLOSE
-    body = statement
-    { ForDecl { init; cond; post; body; } }
-  | WHILE_KW PAREN_OPEN cond = exp PAREN_CLOSE
-    body = statement
-    { While (cond, body) }
-  | DO_KW body = statement WHILE_KW
-    PAREN_OPEN cond = exp PAREN_CLOSE SEMICOLON
-    { Do (cond, body) }
-  | BREAK_KW SEMICOLON
-    { Break }
-  | CONTINUE_KW SEMICOLON
-    { Continue }
-  | l = ID COLON
-    { Label l }
-  | GOTO_KW ID SEMICOLON
-    { Goto $2 }
-  | SEMICOLON
-    { Nop }
-  | block
-    { Block $1 }
+  | declaration SEMICOLON {Decl $1}
+  | for_statement SEMICOLON {$1}
+  | return_statement SEMICOLON  {$1}
 
-decl_exp:
-  var_type = type_def id = ID e = decl_exp_init
-  { { var_type; name = id; init = e } }
+declaration:
+  /* | mult_declaration SEMICOLON  {$1} */
+  | type_def IDENT SEMICOLON {{var_type=$1; var_name=ID $2; init=None}}
+  | type_def IDENT EQ expression SEMICOLON {{var_type=$1; var_name=ID $2; init=Some $4}}
 
-decl_exp_init:
-  | { None }
-  | EQ e = exp { Some e }
+/* mult_declaration: */
 
-if_fstat:
-  | { None }
-  | ELSE_KW fstat = statement { Some fstat }
+for_statement:
+  | FOR_KW PAREN_OPEN declaration SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {Statement(ForDecl{init=$3; cond=$5; post=Some $7; body=Block $9})}
+  | FOR_KW PAREN_OPEN expression SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {Statement(For{init=Some $3; cond=$5; post=Some $7; body=Block $9})}
 
-exp:
-  | i = INT
-    { Const (Int i) }
-  | PAREN_OPEN e = exp PAREN_CLOSE
-    { e }
-  | e1 = exp op = binop e2 = exp
-    { BinOp (op, e1, e2) }
-  | COMPLEMENT e = exp
-    { UnOp (Complement, e) }
-  | BANG e = exp
-    { UnOp (Not, e) }
-  | MINUS e = exp %prec NEG_MINUS
-    { UnOp (Negate, e) }
-  | MULT e = exp %prec DEREF
-    { Dereference e }
-  | BIT_AND e = exp %prec ADDROF
-    { AddressOf e }
-  | lexp = exp aop = assign_op rexp = exp
-    { Assign (aop, lexp, rexp) }
-  | id = ID
-    { Var id }
-  | cond = exp QUESTION texp = exp COLON fexp = exp
-    { Condition (cond, texp, fexp) }
-  | id = ID PAREN_OPEN args = args PAREN_CLOSE
-    { Call (id, args) }
-  | SIZEOF_KW PAREN_OPEN t = type_def PAREN_CLOSE
-    { SizeofType t }
-  | SIZEOF_KW PAREN_OPEN e = exp PAREN_CLOSE
-    { SizeofExp e }
+return_statement:
+  | RETURN_KW expression SEMICOLON {Statement(ReturnVal $2)}
 
-%inline binop:
+expression:
+  | IDENT  {Var(ID $1)}
+  | INT {Const(Int $1)}
+  | unop expression {Monoop($1,$2)}
+  | expression binop expression {BinOp($2,$1,$3)}
+
+unop:
+  | COMPLEMENT  {Complement}
+  | BANG  {Not}
+
+binop:
   | PLUS { Add }
   | MINUS { Sub }
   | MULT { Mult }
   | DIV { Div }
   | MOD { Mod }
   | LT { Lt }
-  | LE { Le }
+  | LE { Leq }
   | GT { Gt }
-  | GE { Ge }
+  | GE { Geq }
   | DOUBLE_EQ { Eq }
   | NEQ { Neq }
   | AND { And }
   | OR { Or }
-  | BIT_AND { BitAnd }
-  | BIT_OR { BitOr }
+  /* | BIT_AND { BitAnd }
+  | BIT_OR { BitOr } */
   | XOR { Xor }
-  | SHIFT_LEFT { ShiftL }
-  | SHIFT_RIGHT { ShiftR }
+  /* | SHIFT_LEFT { ShiftL }
+  | SHIFT_RIGHT { ShiftR } */
 
-%inline assign_op:
-  | EQ { AssignEq }
-  | PLUS_EQ { AddEq }
+assign_op:
+  | EQ { Equals }
+  /* | PLUS_EQ { AddEq }
   | MINUS_EQ { SubEq }
   | MULT_EQ { MultEq }
   | DIV_EQ { DivEq }
@@ -187,5 +128,5 @@ exp:
   | BIT_OR_EQ { BitOrEq }
   | XOR_EQ { XorEq }
   | SHIFT_LEFT_EQ { ShiftLEq }
-  | SHIFT_RIGHT_EQ { ShiftREq }
+  | SHIFT_RIGHT_EQ { ShiftREq } */
 %%

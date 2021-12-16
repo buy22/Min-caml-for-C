@@ -14,7 +14,6 @@ type context = {
   startlb : string list;
   endlb : string list;
   index : int;
-  vars : context_var list;
   out : Out_channel.t;
 }
 
