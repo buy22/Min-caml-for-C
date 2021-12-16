@@ -81,18 +81,18 @@ let rec get_type_size = function
 
 let rec get_exp_type ctx = function
   | Const c -> IntType
-  | Var id -> (find_var id ctx).var_t
+  | Var ID id -> (find_var id ctx).var_t
   | MonOp (_ , e) -> get_exp_type ctx e
   | BinOp (_ , e1, e2)
   | TernOp (_, e1, e2) -> get_exp_type ctx e1
-  | Assign (_, e, _) -> get_exp_type ctx e
+  | Assign (_, _, e) -> get_exp_type ctx e
   | FunCall _ -> IntType
 
 let rec gen_exp e (ctx : context) =
   match e with
   | Const c ->
     gen_const c ctx
-  | Var id ->
+  | Var ID id ->
     let v =  find_var id ctx in
       movw (off v.loc "%rbp") "%rax" ctx
   | MonOp (monop, e) -> ctx
@@ -118,7 +118,7 @@ let rec gen_exp e (ctx : context) =
           |> label lb0
           |> gen_exp fexp
           |> label lb1
-  | Assign (Equals, Var id, rexp) ->
+  | Assign (Equals, ID id, rexp) ->
     let v = find_var id ctx in
       ctx
         |> gen_exp rexp
@@ -127,14 +127,14 @@ let rec gen_exp e (ctx : context) =
     raise (CodeGenError
               "the left hand side of an assignment should be a variable or a dereference")
   | Assign (op, lexp, rexp) ->
-    let bexp = (BinOp (gen_assign_op op, lexp, rexp)) in
+    let bexp = (BinOp (gen_assign_op op, Var lexp, rexp)) in
       gen_exp (Assign (Equals, lexp, bexp)) ctx
-  | FunCall (f, args) -> (* TODO *)
-    gen_args 0 args ctx
+  | FunCall (ID f, args) -> (* TODO *)
+    ctx
       |> call f
 
 let gen_declaration (de : declaration) ctx =
-  (match get_var_level de.name ctx with
+  (match get_var_level de.var_name ctx with
    | Some l ->
      if l = ctx.scope_levelc
      then raise (CodeGenError(de.var_name ^ " has already been defined in the same block"))
@@ -261,7 +261,7 @@ let gen_fun (f : fun_declaration) out =
     scope_levelc = 0; labelc = 0;
     startlb = [];  endlb = [];
     vars = []; out = out }
-  |> globel_label f.name
+  |> global_label f.name
   |> label f.name
   |> push "%rbp"
   |> movw "%rsp" "%rbp"

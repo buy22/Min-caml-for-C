@@ -31,6 +31,7 @@ let find_var id ctx =
   | Some v -> v
   | None -> raise (CodeGenError ("can't find " ^ id ^ " in the context"))
 
+(* TODO *)
 let get_var_level id ctx =
   match List.find ctx.vars (fun v -> String.equal id v.id) with
   | Some v -> Some v.scope_level
@@ -58,6 +59,7 @@ let set_labels lb0 lb1 ctx =
     endlb = lb1:: ctx.endlb;}
 
 let unset_labels ctx =
+  (* print_string "!unset"; *)
   match ctx.startlb, ctx.endlb with
   | (_ :: sls), (_ :: els) ->
     { ctx with startlb = sls; endlb = els;}

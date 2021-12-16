@@ -14,9 +14,11 @@ type binop =
   | Div
   | Mod
   | Lt
-  | Gt
   | Le
+  | Gt
   | Ge
+  | Leq
+  | Geq
   | Neq
   | Eq
   | And
@@ -26,14 +28,14 @@ type binop =
 type assign_op =
   | Equals (* = *)
 
-type monoop = Negate | Pos | Complement | Not
+type monop = Negate | Pos | Complement | Not
 
 type id = ID of string
 
 type exp =
   | Const of const
   | Var of id
-  | Monoop of monoop * exp
+  | MonOp of monop * exp
   | BinOp of binop * exp * exp
   | TernOp of exp * exp * exp
   | Assign of assign_op * id * exp

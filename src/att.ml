@@ -8,6 +8,16 @@
 open Core
 open Context
 
+(* type context = {
+  fun_name : string;
+  scope_levelc : int;
+  labelc : int;
+  startlb : string list;
+  endlb : string list;
+  index : int;
+  out : Out_channel.t;
+} *)
+
 let my_print_string s ctx = Out_channel.output_string ctx.out s; ctx
 
 let global_label f =
@@ -68,7 +78,7 @@ let imul = two_op "IMUL"
 
 let div = two_op "DIV"
 
-let idiv = two_op "IDIV"
+let idiv = one_op "IDIV"
 
 (* Logic *)
 (* "and" & "or" - modify spelling for Ocaml has "and" & "or" *)

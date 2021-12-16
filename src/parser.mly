@@ -90,7 +90,7 @@ return_statement:
 expression:
   | IDENT  {Var(ID $1)}
   | INT {Const(Int $1)}
-  | unop expression {Monoop($1,$2)}
+  | unop expression {MonOp($1,$2)}
   | expression binop expression {BinOp($2,$1,$3)}
 
 unop:
