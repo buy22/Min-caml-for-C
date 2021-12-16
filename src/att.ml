@@ -20,6 +20,9 @@ type context = {
 
 let my_print_string s ctx = Out_channel.output_string ctx.out s; ctx
 
+let global_label f =
+  "\t.global_label " ^ f ^ "\n" |> my_print_string
+
 let label f =
   f ^ ":\n" |> my_print_string
 
@@ -107,6 +110,8 @@ let rcr = two_op "RCR"
 
 (* Transfer *)
 let jcc = one_op "JCC"
+
+let je = one_op "JE"
 
 let jmp = one_op "JMP"
 
