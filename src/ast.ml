@@ -1,14 +1,3 @@
-(*
-This file makes use of source code in the file ast.ml in the project "socc" to
-record and print out the structure of the parse tree.
-Author: noti0na1
-Publish date: June, 2018
-Title of the program: socc
-Filename: ast.ml
-Type: source code
-Web address: https://github.com/noti0na1/socc
-*)
-
 open Core
 
 type const =
@@ -77,8 +66,8 @@ and statement =
   | Block of block
   | If of {cond: exp; if_body: statement; else_body: statement option}
   | Exp of exp option
-  | For of {init: exp option; cond: exp; post: exp option; body: block}
-  | ForDecl of {init: declaration; cond: exp; post: exp option; body: block}
+  | For of {init: exp option; cond: exp; post: exp option; body: statement}
+  | ForDecl of {init: declaration; cond: exp; post: exp option; body: statement}
   | While of {cond: exp; body: statement}
   | ReturnVal of exp
   | Break
