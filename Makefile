@@ -1,10 +1,18 @@
-.PHONY: all clean byte native profile debug sanity test
+# This file uses part of Makefile in the project "socc" to make the environment
+# using Core and Menhir.
+# Author: noti0na1
+# Publish date: June, 2018
+# Title of the program: socc
+# Filename: ast.ml
+# Type: source code
+# Web address: https://github.com/noti0na1/socc
 
-OCB_FLAGS = -use-ocamlfind -use-menhir -I src # uses menhir
-# OCB = ocamlbuild $(OCB_FLAGS)
+.PHONY: all clean native byte sanity test
+
+OCB_FLAGS = -use-ocamlfind -use-menhir -I src
 OCB = corebuild $(OCB_FLAGS)
 
-all: native byte # profile debug
+all: native byte
 
 clean:
 	$(OCB) -clean
@@ -15,13 +23,6 @@ native: sanity
 byte: sanity
 	$(OCB) main.byte
 
-profile: sanity
-	$(OCB) -tag profile main.native
-
-debug: sanity
-	$(OCB) -tag debug main.byte
-
-# check that menhir is installed, use "opam install menhir"
 sanity:
 	which menhir
 
