@@ -1,8 +1,4 @@
 (Prog
     ((Function
-         ((fun_type StringType) (name (ID main)) (params ())
-             (body
-                 (((Decl
-                       ((var_type StringType) (var_name (ID a))
-                           (init ((Const (String w))))))
-                      (Statement (ReturnVal (Var (ID a)))))))))))
+         ((fun_type IntType) (name (ID test0)) (params ())
+             (body (((Statement (ReturnVal (Const (Int 0)))))))))))

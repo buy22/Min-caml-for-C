@@ -32,10 +32,10 @@ type binop =
 [@@deriving sexp]
 
 type assign_op =
-  | Equals (* = *)
+  | Equals
 [@@deriving sexp]
 
-type monop = Negate | Pos | Complement | Not
+type monop = Complement | Not
 [@@deriving sexp]
 
 type id = ID of string
@@ -46,9 +46,7 @@ type exp =
   | Var of id
   | MonOp of monop * exp
   | BinOp of binop * exp * exp
-  | TernOp of exp * exp * exp
   | Assign of assign_op * id * exp
-  | FunCall of id * exp list
 [@@deriving sexp]
 
 type declaration =
@@ -71,7 +69,6 @@ and statement =
   | For of {init: exp option; cond: exp; post: exp option; body: statement}
   | ForDecl of {init: declaration; cond: exp; post: exp option; body: statement}
   | While of {cond: exp; body: statement}
-  | DoWhile of {body: statement; cond: exp}
   | ReturnVal of exp
   | Break
   | Continue
@@ -88,12 +85,12 @@ type fun_declaration =
   }
 [@@deriving sexp]
 
-type top_level =
+type global =
   | Function of fun_declaration
   | GlobalVar of declaration
 [@@deriving sexp]
 
-type prog = Prog of top_level list
+type prog = Prog of global list
 [@@deriving sexp]
 
 
