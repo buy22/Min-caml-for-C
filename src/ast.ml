@@ -66,8 +66,8 @@ and statement =
   | Block of block
   | If of {cond: exp; if_body: statement; else_body: statement option}
   | Exp of exp option
-  | For of {init: exp option; cond: exp; post: exp option; body: statement}
-  | ForDecl of {init: declaration; cond: exp; post: exp option; body: statement}
+  | For of {init: exp option; cond: exp; post: exp option; body: block}
+  | ForDecl of {init: declaration; cond: exp; post: exp option; body: block}
   | While of {cond: exp; body: statement}
   | ReturnVal of exp
   | Break
