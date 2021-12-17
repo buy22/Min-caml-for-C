@@ -13,42 +13,42 @@ let identifier = letter (letter | digit)*
 rule token = parse
   | eof { Format.eprintf "eof\n"; EOF }
   | whitespace { Format.eprintf "whitespace\n"; token lexbuf }
-  | "int" { INT_KW }
-  | "char" { CHAR_KW }
-  | "string" { STRING_KW }
-  | "return" { RETURN_KW }
-  | "if" { IF_KW }
-  | "else"  { ELSE_KW }
-  | "for"   { FOR_KW }
-  | "while" { WHILE_KW }
-  | '{' { BRACE_OPEN }
-  | '}' { BRACE_CLOSE }
+  | "int" { Format.eprintf "int\n"; INT_KW }
+  | "char" { Format.eprintf "char\n"; CHAR_KW }
+  | "string" { Format.eprintf "string\n"; STRING_KW }
+  | "return" { Format.eprintf "return\n"; RETURN_KW }
+  | "if" { Format.eprintf "if\n"; IF_KW }
+  | "else"  { Format.eprintf "else\n"; ELSE_KW }
+  | "for"   { Format.eprintf "for\n"; FOR_KW }
+  | "while" { Format.eprintf "while\n"; WHILE_KW }
+  | '{' { Format.eprintf "{\n"; BRACE_OPEN }
+  | '}' { Format.eprintf "}\n"; BRACE_CLOSE }
   | '(' { Format.eprintf "(\n"; PAREN_OPEN }
-  | ')' { PAREN_CLOSE }
-  | ',' { COMMA }
+  | ')' { Format.eprintf ")\n"; PAREN_CLOSE }
+  | ',' { Format.eprintf ",\n"; COMMA }
   | ';' { Format.eprintf ";\n"; SEMICOLON }
-  | ':' { COLON }
-  | '!' { BANG }
-  | '~' { COMPLEMENT }
-  | '+' { PLUS }
-  | '-' { MINUS }
-  | '*' { MULT }
-  | '/' { DIV }
-  | '%' { MOD }
-  | '^' { XOR }
+  | ':' { Format.eprintf ":\n"; COLON }
+  | '!' { Format.eprintf "!\n"; BANG }
+  | '~' { Format.eprintf "~\n"; COMPLEMENT }
+  | '+' { Format.eprintf "+\n"; PLUS }
+  | '-' { Format.eprintf "-\n"; MINUS }
+  | '*' { Format.eprintf "*\n"; MULT }
+  | '/' { Format.eprintf "/\n"; DIV }
+  | '%' { Format.eprintf "mod\n"; MOD }
+  | '^' { Format.eprintf "^\n"; XOR }
   | '<' { Format.eprintf "<\n"; LT }
-  | "<=" { LE }
-  | '>' { GT }
-  | ">=" { GE }
-  | '=' { EQ }
-  | "==" { DOUBLE_EQ }
-  | "!=" { NEQ }
-  | "&&" { AND }
-  | "||" { OR }
-  | digit+ as integer { Format.eprintf "integer\n"; INT(int_of_string integer) }
-  | identifier as s { IDENT s }
+  | "<=" { Format.eprintf "<=\n"; LE }
+  | '>' { Format.eprintf ">\n"; GT }
+  | ">=" { Format.eprintf ">=\n"; GE }
+  | '=' { Format.eprintf "=\n"; EQ }
+  | "==" { Format.eprintf "==\n"; DOUBLE_EQ }
+  | "!=" { Format.eprintf "!=\n"; NEQ }
+  | "&&" { Format.eprintf "&&\n"; AND }
+  | "||" { Format.eprintf "||\n"; OR }
+  | digit+ as integer { Format.eprintf "%s\n" integer; INT(int_of_string integer) }
+  | identifier as s { Format.eprintf "%s\n" s; IDENT s }
   | "\"" as s { string "" lexbuf}
-  | _ as c { raise (SyntaxError ("Unknown char: " ^ (Char.escaped c))) }
+  | _ as c { raise (SyntaxError ("Unknown String to Lexer")) }
 
 and string str = parse
   "\""  {STRING str}
