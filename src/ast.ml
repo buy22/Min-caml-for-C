@@ -9,6 +9,7 @@ type const =
 type type_def =
   | IntType
   | CharType
+  | StringType
 [@@deriving sexp]
 
 type binop =

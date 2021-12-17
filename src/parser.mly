@@ -5,12 +5,12 @@
 
 %token <int> INT
 %token <char> CHAR
-%token <string> IDENT
+%token <string> IDENT STRING
 %token BRACE_OPEN BRACE_CLOSE PAREN_OPEN PAREN_CLOSE BRACKET_OPEN BRACKET_CLOSE
 %token COMMA QUESTION SEMICOLON COLON
 %token RETURN_KW
-%token INT_KW CHAR_KW IF_KW ELSE_KW
-/* %token VOID_KW INT_KW CHAR_KW LONG_KW UNSIGNED_KW FLOAT_KW DOUBLE_KW */
+%token INT_KW CHAR_KW IF_KW ELSE_KW STRING_KW
+/* %token VOID_KW INT_KW CHAR_KW LONG_KW UNSIGNED_KW FLOAT_KW DOUBLE_KW*/
 /* %token STRUCT_KW CONST_KW STATIC_KW SIZEOF_KW RETURN_KW GOTO_KW */
 /* %token IF_KW ELSE_KW SWITCH_KW FOR_KW DO_KW WHILE_KW BREAK_KW CONTINUE_KW */
 %token FOR_KW WHILE_KW
@@ -46,6 +46,7 @@
 type_def:
   | INT_KW { IntType }
   | CHAR_KW { CharType }
+  | STRING_KW { StringType }
 
 program:
   | function_declaration  { Prog($1::[]) }
@@ -79,7 +80,6 @@ declaration:
   | type_def IDENT SEMICOLON {{var_type=$1; var_name=ID $2; init=None}}
   | type_def IDENT EQ expression SEMICOLON {{var_type=$1; var_name=ID $2; init=Some $4}}
 
-
 for_statement:
   | FOR_KW PAREN_OPEN declaration SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {ForDecl{init=$3; cond=$5; post=Some $7; body=Block $9}}
   | FOR_KW PAREN_OPEN expression SEMICOLON expression SEMICOLON expression PAREN_CLOSE body_block {For{init=Some $3; cond=$5; post=Some $7; body=Block $9}}
@@ -90,6 +90,7 @@ return_statement:
 expression:
   | variable  {Var $1}
   | const {Const $1}
+  | PAREN_OPEN expression PAREN_CLOSE { $2 }
   | unop expression {MonOp($1,$2)}
   | expression binop expression {BinOp($2,$1,$3)}
 
@@ -99,6 +100,7 @@ variable:
 const:
   | INT {Int $1}
   | CHAR  {Char $1}
+  | STRING  {String $1}
 
 unop:
   | COMPLEMENT  {Complement}
@@ -136,4 +138,3 @@ assign_op:
   | XOR_EQ { XorEq }
   | SHIFT_LEFT_EQ { ShiftLEq }
   | SHIFT_RIGHT_EQ { ShiftREq } */
-
