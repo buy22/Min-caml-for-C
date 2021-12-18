@@ -28,4 +28,4 @@ sanity:
 
 test: native
 	./main.native < test/test.c > test/test.s
-	clang test/test.s -o test/test
+	
