@@ -68,6 +68,7 @@ statement:
   | return_statement  {Statement $1}
   | declaration {Decl $1}
   | for_statement {Statement $1}
+  | while_statement {Statement $1}
 
 declaration:
   | type_def IDENT SEMICOLON {{var_type=$1; var_name=ID $2; init=None}}
@@ -80,6 +81,9 @@ assignment:
 for_statement:
   | FOR_KW PAREN_OPEN declaration expression SEMICOLON expression PAREN_CLOSE BRACE_OPEN body_block BRACE_CLOSE {ForDecl{init=$3; cond=$4; post=Some $6; body= $9}}
   | FOR_KW PAREN_OPEN expression SEMICOLON expression SEMICOLON expression PAREN_CLOSE BRACE_OPEN body_block BRACE_CLOSE {For{init=Some $3; cond=$5; post=Some $7; body= $10}}
+
+while_statement:
+  | WHILE_KW PAREN_OPEN expression PAREN_CLOSE BRACE_OPEN body_block BRACE_CLOSE {While{cond=$3; body=$6}}
 
 return_statement:
   | RETURN_KW expression SEMICOLON {ReturnVal $2}

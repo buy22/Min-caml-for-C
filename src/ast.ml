@@ -68,7 +68,7 @@ and statement =
   | Exp of exp option
   | For of {init: exp option; cond: exp; post: exp option; body: block}
   | ForDecl of {init: declaration; cond: exp; post: exp option; body: block}
-  | While of {cond: exp; body: statement}
+  | While of {cond: exp; body: block}
   | ReturnVal of exp
   | Break
   | Continue
