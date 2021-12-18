@@ -3,7 +3,7 @@ int main() {
   int b = 456;
   int b = 222 / a * b + 1;
   while (a<1){
-    a = 2;
+    int c = 2;
   }
   return b;
 }
