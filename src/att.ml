@@ -1,42 +1,34 @@
 (*AT&T Assembly Language 
   format: 
-   lable: Instructor Operator
+   lable: Instructor Operator(s)
    [operator1: dest; operator2: src]
    --must use "l""b""w" to identify the type of operators.
 *)
 
 open Core
-open Context
+open Stdlib
 
-(* type context = {
-  fun_name : string;
-  scope_levelc : int;
-  labelc : int;
-  startlb : string list;
-  endlb : string list;
-  index : int;
-  out : Out_channel.t;
-} *)
+let att_print s ctx = output_string ctx s
 
-let my_print_string s ctx = Out_channel.output_string ctx.out s; ctx
-
+(* usually label for main *)
 let global_label f =
-  "\t.global_label " ^ f ^ "\n" |> my_print_string
+  "\t.globl " ^ f ^ "\n" |> att_print
 
+(* label for function *)
 let label f =
-  f ^ ":\n" |> my_print_string
+  f ^ ":\n" |> att_print
 
 (* Instructor without operator *)
 let no_op c =
-  String.concat ["\t";  c;  "\n"] |> my_print_string
+  String.concat ["\t";  c;  "\n"] |> att_print
 
 (* Instructor with 1 operator *)
 let one_op c a =
-  String.concat ["\t"; c; "\t"; a; "\n"] |> my_print_string
+  String.concat ["\t"; c; "\t"; a; "\n"] |> att_print
 
 (* Instructor with 2 operator *)
 let two_op c a b =
-  String.concat ["\t"; c; "\t"; a; ", "; b; "\n"] |> my_print_string
+  String.concat ["\t"; c; "\t"; a; ", "; b; "\n"] |> att_print
 
 let movl = two_op "MOVL"
 
@@ -61,7 +53,6 @@ let setg = one_op "SETG"
 let setge = one_op "SETGE"
 
 (* Calculation *)
-
 let add = two_op "ADD"
 
 let sub = two_op "SUB"
@@ -90,7 +81,12 @@ let xor = two_op "XOR"
 
 let not = one_op "NOT"
 
-let test = two_op "TEST"
+(* Transfer *)
+let jcc = one_op "JCC"
+
+let je = one_op "JE"
+
+let jmp = one_op "JMP"
 
 let shl = one_op "SHL"
 
@@ -108,13 +104,7 @@ let rcl = two_op "RCL"
 
 let rcr = two_op "RCR"
 
-(* Transfer *)
-let jcc = one_op "JCC"
-
-let je = one_op "JE"
-
-let jmp = one_op "JMP"
-
+(* Other items *)
 let call = one_op "CALL"
 
 let nop = no_op "NOP"
@@ -124,3 +114,5 @@ let ret = no_op "RET"
 let enter = two_op "ENTER"
 
 let leave = no_op "LEAVE"
+
+let test = two_op "TEST"
